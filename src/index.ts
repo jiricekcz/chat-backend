@@ -13,7 +13,9 @@ for (var key in process.env) {
 
 //HTTP
 import * as http from "./http";
-http.init(Number(process.env.CHAT_API_PORT)).then(() => {
+Promise.all<void>([
+    http.init(Number(process.env.CHAT_API_PORT))
+]).then(() => {
     console.log("HTTP services:".magenta)
     console.log("    HTTP initialized at port " + process.env.CHAT_API_PORT?.yellow)
 })
