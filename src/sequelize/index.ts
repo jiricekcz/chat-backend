@@ -6,7 +6,12 @@ export const sequelize = new Sequelize.Sequelize({
     logging: Boolean(process.env.CHAT_DEBUG)
 });
 export const databaseName = "SQLite: database.sqlite"; 
-export class Message extends Sequelize.Model {
+export class Message extends Sequelize.Model<{
+    text: string, 
+    author: string,
+    modifiedAt: Date,
+    chatId: string
+}> {
     text!: string;
     author!: string;
     modifiedAt!: Date;
