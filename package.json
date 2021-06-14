@@ -21,6 +21,8 @@
   },
   "homepage": "https://github.com/jiricekcz/chat-backend#readme",
   "dependencies": {
+    "colors": "^1.4.0",
+    "dotenv": "^10.0.0",
     "socket.io": "^4.1.2",
     "ts-node": "^10.0.0"
   }
