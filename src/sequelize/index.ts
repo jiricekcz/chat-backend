@@ -4,7 +4,7 @@ export const sequelize = new Sequelize.Sequelize({
     dialect: "sqlite",
     storage: "../../database.sqlite"
 });
-
+export const databaseName = "SQLite: database.sqlite"; 
 export class Message extends Sequelize.Model {
     text!: string;
     author!: string;
