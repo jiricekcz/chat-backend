@@ -29,6 +29,9 @@ server.use(function identification(socket, next) {
 
     socket.data.room = room;
     socket.data.id = id;
+
+    socket.join(room);
+    socket.join(id);
 });
 server.on("connection", (socket) => {
     handleSocket(socket);
