@@ -1,0 +1,27 @@
+{
+  "name": "chat-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "/build/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "postinstall": "npm run build",
+    "start": "node .",
+    "debug": "ts-node ./src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jiricekcz/chat-backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jiricekcz/chat-backend/issues"
+  },
+  "homepage": "https://github.com/jiricekcz/chat-backend#readme",
+  "dependencies": {
+    "socket.io": "^4.1.2",
+    "ts-node": "^10.0.0"
+  }
+}
