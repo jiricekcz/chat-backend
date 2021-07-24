@@ -11,7 +11,6 @@ export default async function handleSocket(socket: io.Socket): Promise<void> {
             text,
             modifiedAt: new Date()
         };
-        database.Message.create(message);
         socket.to(socket.data.room).emit("new_message", message);
     });
 }

@@ -34,7 +34,8 @@ export default async function router(req: http.IncomingMessage, body: string): P
         }
         if (segments.length == 1) {
             try {
-                const m = await messageManager.getMessages(segments[0]);
+                const messageCount = await messageManager.getChannelMessageCount(segments[0]);
+                const m = await messageManager.getMessages(segments[0], messageCount - 20, messageCount);
                 return {
                     status: 200,
                     response: JSON.stringify({
