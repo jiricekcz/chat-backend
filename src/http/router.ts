@@ -9,7 +9,7 @@ export default async function router(req: http.IncomingMessage, body: string): P
             status: 404,
             response: JSON.stringify({
                 msg: "Resource not found.",
-                possibleFix: "Maybe forgot the /api/url prefix for all api requests."
+                possibleFix: "Maybe forgot the /api/ url prefix for all api requests."
             })
         }
     }
@@ -34,7 +34,7 @@ export default async function router(req: http.IncomingMessage, body: string): P
         }
         if (segments.length == 1) {
 
-        }
+        }  
         if (segments.length == 2) {
             try {
                 const m = await messageManager.getMessage(segments[0], segments[1]);
