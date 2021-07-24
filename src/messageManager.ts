@@ -1,4 +1,4 @@
-export async function getMessages(channelId: string): Promise<Array<Message>> {
+export async function getMessages(channelId: string, limit = 20): Promise<Array<Message>> {
     return [];
 }
 export async function getMessage(channelId: string, messageId: string): Promise<Message> {
