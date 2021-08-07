@@ -1,4 +1,3 @@
-import redis from "redis";
 import * as sequelize from "./sequelize";
 import sq from "sequelize";
 
@@ -11,13 +10,32 @@ export async function getMessages(channelId: string, from: number, to: number): 
     const c = await getChannel(channelId);
     return await c.getMessages(from, to);
 }
-export async function getMessage(channelId: string, messageId: string): Promise<Message> {
-    throw 0;
+export async function getMessage(messageId: string): Promise<Message> {
+    const m = await sequelize.Message.findByPk(messageId);
+    if (!m) throw new Error("Message not found.");
+    return Message.fromSequlize(m);
+}
+export async function addMessage(message: { author: string, chatId: string, text: string, modifiedAt: Date }): Promise<Message> {
+    const chat = await getChannel(message.chatId);
+    const m = await sequelize.Message.create(
+        {
+            author: message.author,
+            chatId: message.chatId,
+            modifiedAt: message.modifiedAt.getTime(),
+            text: message.text,
+            id: String(Date.now()) + Math.round(Math.random() * 10000),
+            numberInChat: chat.messageCount + 1
+        }
+    );
+    chat.update();
+    chat.loadMessages(chat.messageCount - 1, chat.messageCount);
+    return Message.fromSequlize(m);
 }
 export async function getChannelMessageCount(channelId: string): Promise<number> {
     const c = await getChannel(channelId);
     return c.messageCount;
 }
+// export async function 
 
 export class Message {
     readonly channelId: string;
@@ -40,21 +58,34 @@ export class Message {
 }
 export class Channel {
     readonly id: string;
-    readonly userIds: string[];
+    userIds: string[];
     readonly messages: Map<number, Message> = new Map<number, Message>();
-    readonly messageCount: number;
-    constructor(id: string, userIds: Array<string>, messageCount: number) {
+    messageCount: number;
+    readonly sequelize: sequelize.Channel;
+    constructor(id: string, userIds: Array<string>, messageCount: number, seq: sequelize.Channel) {
         this.messageCount = messageCount;
         this.id = id;
         this.userIds = userIds;
+        this.sequelize = seq;
+    }
+    async update(): Promise<void> {
+        this.sequelize.save();
+        const c = await sequelize.Channel.findByPk(this.id);
+        if (!c) return;
+        this.userIds = JSON.parse(c.userIds);
+        this.messageCount = c.messageCount;
+    }
+    async incrementMessageCount(): Promise<void> {
+        this.sequelize.messageCount++;
+        this.update();
     }
     async loadMessages(minId: number, maxId: number): Promise<void> {
         const ms = await sequelize.Message.findAll({
             where: {
                 numberInChat: {
-                    [AND]: {
-                        [GTE]: minId,
-                        [LTE]: maxId
+                    [ AND ]: {
+                        [ GTE ]: minId,
+                        [ LTE ]: maxId
                     }
                 }
             }
@@ -76,7 +107,7 @@ export class Channel {
         return rv;
     }
     static fromSequlize(channel: sequelize.Channel): Channel {
-        return new Channel(channel.id, JSON.parse(channel.userIds), channel.messageCount);
+        return new Channel(channel.id, JSON.parse(channel.userIds), channel.messageCount, channel);
     }
 }
 // ! CACHE

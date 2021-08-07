@@ -1,5 +1,5 @@
 import io from 'socket.io';
-import * as database from '../sequelize';
+import * as database from '../messageManager';
 
 
 
@@ -12,5 +12,6 @@ export default async function handleSocket(socket: io.Socket): Promise<void> {
             modifiedAt: new Date()
         };
         socket.to(socket.data.room).emit("new_message", message);
+        database.addMessage(message);
     });
 }
