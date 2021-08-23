@@ -30,7 +30,7 @@ export class JwtService {
     }
     private async signByKey(string: string): Promise<string> {
         let sign = crypto.createSign("RSA-SHA256");
-        sign.update(string);
+        sign.update(string); 
         return sign.sign(this.privateKey, "base64");
     }
 }

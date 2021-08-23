@@ -28,7 +28,7 @@ export class UsersController {
 
     @Post("register")
     register(@Body() body: RegisterDto): any {
-
+        this.usersService.create(body.username);
     }
 
     
