@@ -5,14 +5,23 @@ import { Repository } from "typeorm"
 @Injectable()
 export class UsersService {
     constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) { }
-    async findOne(username: string): Promise<User | null> {
+    async findOne(username: string, loadChats = false): Promise<User | null> {
+        const relations = loadChats ? {
+            relations: ["chats"]
+        } : null;
         const u = await this.userRepository.findOne({
-            where: { username: username }
-        })
+            where: { username: username },
+            ...relations
+        });
         return u === undefined ? null : u;
     }
-    async findById(id: string): Promise<User | null> {
-        const u = await this.userRepository.findOne(id);
+    async findById(id: string, loadChats = false): Promise<User | null> {
+        const relations = loadChats ? {
+            relations: ["chats"]
+        } : null;
+        const u = await this.userRepository.findOne(id , {
+            ...relations,
+        });
         return u === undefined ? null : u;
     }
     async create(username: string): Promise<void> {
