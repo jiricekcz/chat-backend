@@ -18,7 +18,7 @@ export class ChatsService {
     }
     async sendMessage(chat: Chat, content: string, user: User): Promise<Message> {
         const message = this.messageRepository.create({
-            chat, content, author: user, numberInChat: ++chat.messageCount
+            chat, content, author: user, numberInChat: ++chat.messageCount, sentAt: Date.now()
         });
         await this.chatRepository.save(chat);
         return await this.messageRepository.save(message);

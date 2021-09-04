@@ -8,4 +8,6 @@ export class MessageInChatDto {
     content: string;
     @ApiProperty()
     author: AuthorDto;
+    @ApiProperty()
+    sentAt: Date;
 }

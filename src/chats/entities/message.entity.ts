@@ -25,4 +25,8 @@ export class Message {
     })
     @ApiProperty({ type: () => User })
     author: User;
+
+    @Column({ type: "datetime", default: 0 })
+    @ApiProperty()
+    sentAt: Date;
 }
