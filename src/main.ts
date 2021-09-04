@@ -4,7 +4,7 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
 
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule, { cors: true });
 
     const config = new DocumentBuilder().setTitle("HAKLR Chat API")
         .setDescription("API for the haklr chat application")
