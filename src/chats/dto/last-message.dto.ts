@@ -8,6 +8,6 @@ export class LastMessageDto {
     content: string;
     @ApiProperty({ type: () => AuthorDto })
     author: AuthorDto;
-    @ApiProperty()
+    @ApiProperty({ type: "number" })
     sentAt: Date;
 }
