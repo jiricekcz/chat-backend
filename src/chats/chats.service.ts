@@ -5,15 +5,15 @@ import { Repository } from 'typeorm';
 import { Chat } from './entities/chat.entity';
 import { Message } from './entities/message.entity';
 import { Between } from "typeorm";
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ChatsService {
-    constructor(@InjectRepository(Message) private readonly messageRepository: Repository<Message>, @InjectRepository(Chat) private readonly chatRepository: Repository<Chat>) { }
+    constructor(@InjectRepository(Message) private readonly messageRepository: Repository<Message>, @InjectRepository(Chat) private readonly chatRepository: Repository<Chat>, private readonly usersService: UsersService) { }
     async getChatById(id: number): Promise<Chat> {
         return this.chatRepository.findOne(id);
     }
     async getAllChatsForUser(user: User): Promise<Chat[]> {
-        console.log(user.chats);
         return user.chats;
     }
     async sendMessage(chat: Chat, content: string, user: User): Promise<Message> {
@@ -45,5 +45,9 @@ export class ChatsService {
                 numberInChat: Between(chat.messageCount - skipCount - count, chat.messageCount - skipCount)
             }
         });
+    }
+    async addUserToChat(chat: Chat, user: User): Promise<void> {
+        chat.members.push(user);
+        await this.chatRepository.save(chat);
     }
 }

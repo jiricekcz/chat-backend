@@ -1,4 +1,7 @@
 import { Query } from '@nestjs/common';
+
+import { AddUserDto } from './dto/add-user.dto';
+
 import { NotFoundException, Param, UnauthorizedException, UseGuards, Request } from '@nestjs/common';
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags, ApiQuery } from '@nestjs/swagger';
@@ -45,7 +48,7 @@ export class ChatsController {
     @ApiCreatedResponse({ type: Chat })
     @UseGuards(JwtAuthGuard)
     async createChat(@Request() req, @Body() body: CreateChatDto): Promise<Chat> {
-        const user = req.user;
+        const user = req.user.user;
         return this.chatsService.createChat(body.name, [user]);
     }
 
@@ -53,7 +56,7 @@ export class ChatsController {
     @ApiOkResponse({ type: SentMessageDto })
     @UseGuards(JwtAuthGuard)
     async sendMessage(@Request() req, @Param("chatId") chatId: string, @Body() body: SendMessageDto): Promise<SentMessageDto> {
-        const user = req.user;
+        const user = req.user.user;
         const chat = await this.chatsService.getChatById(Number(chatId));
         if (!chat) throw new NotFoundException("Chat not found.");
         if (!chat.members.some(member => member.id == user.id)) throw new UnauthorizedException("User does not have permission to send messages to this chat.");
@@ -75,6 +78,13 @@ export class ChatsController {
     async getMessages(@Request() req, @Param("chatId") chatId: string, @Query("count") count: number = 20, @Query("from") from: number = 0): Promise<MessageInChatDto[]> {
         const chat = await this.chatsService.getChatById(Number(chatId));
         return this.chatsService.getMessages(chat, count, from)
+    }
+
+    @Post(":chatId/user")
+    @ApiOkResponse()
+    @UseGuards(JwtAuthGuard)
+    async addUser(@Param("chatId") chatId: string, @Body() body: AddUserDto): Promise<void> {
+        this.chatsService.addUserToChat(await this.chatsService.getChatById(Number(chatId)), await this.usersService.findById(String(body.userId), true));
     }
 }
 

@@ -13,20 +13,11 @@ export class Chat {
     @Column()
     name: string;
 
-    @ManyToMany(() => User, (user: User) => user.chats,{
-        eager: true
+    @ManyToMany(() => User, (user: User) => user.chats, {
+        eager: true,
+        cascade: true
     })
-    @JoinTable({
-        name: "chat_members_join",
-        joinColumn: {
-            name: "chat",
-            referencedColumnName: "id"
-        },
-        inverseJoinColumn: { 
-            name: "members",
-            referencedColumnName: "id"
-        }
-    })
+    @JoinTable()
     @ApiProperty({ type: () => User, isArray: true })
     members: Array<User>;
 
