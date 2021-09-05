@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable, UnauthorizedException, BadRequestException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { Strategy } from "passport-custom"
 import { User } from "src/users/entities/user.entity";
@@ -10,6 +10,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt-custom") {
         super();
     }
     async validate(request: Request): Promise<{ payload: any, user: User }> {
+        if (!(request.headers as any).authorization) throw new BadRequestException({
+            reason: "Missing authorization header"
+        });
         const token: string = (request.headers as any).authorization.includes("Bearer ") ? (request.headers as any).authorization.replace("Bearer ", "") : undefined;
         const payload = await this.jwtService.verify(token);
         if (!payload) throw new UnauthorizedException();

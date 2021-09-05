@@ -1,7 +1,8 @@
 import { Query } from '@nestjs/common';
-import { NotFoundException, Param, UnauthorizedException } from '@nestjs/common';
+import { NotFoundException, Param, UnauthorizedException, UseGuards, Request } from '@nestjs/common';
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags, ApiQuery } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/jwt/jwt-auth.guard';
 import { UsersService } from 'src/users/users.service';
 import { ChatsService } from './chats.service';
 import { ChatResponseDto } from './dto/chat-response.dto';
@@ -18,8 +19,10 @@ export class ChatsController {
 
     @Get()
     @ApiOkResponse({ type: ChatResponseDto, isArray: true })
-    async getAllChats(): Promise<ChatResponseDto[]> {
-        const user = await this.usersService.findById("1", true);
+    @UseGuards(JwtAuthGuard)
+    async getAllChats(@Request() req): Promise<ChatResponseDto[]> {
+        const user = req.user;
+        console.log(req.user);
         console.log(user);
         const chats = await this.chatsService.getAllChatsForUser(user);
         const rv: Array<ChatResponseDto> = [];
@@ -42,15 +45,17 @@ export class ChatsController {
 
     @Post()
     @ApiCreatedResponse({ type: Chat })
-    async createChat(@Body() body: CreateChatDto): Promise<Chat> {
-        const user = await this.usersService.findById("1", true);
+    @UseGuards(JwtAuthGuard)
+    async createChat(@Request() req, @Body() body: CreateChatDto): Promise<Chat> {
+        const user = req.user;
         return this.chatsService.createChat(body.name, [user]);
     }
 
     @Post(":chatId/message")
     @ApiOkResponse({ type: SentMessageDto })
-    async sendMessage(@Param("chatId") chatId: string, @Body() body: SendMessageDto): Promise<SentMessageDto> {
-        const user = await this.usersService.findById("1", true);
+    @UseGuards(JwtAuthGuard)
+    async sendMessage(@Request() req, @Param("chatId") chatId: string, @Body() body: SendMessageDto): Promise<SentMessageDto> {
+        const user = req.user;
         const chat = await this.chatsService.getChatById(Number(chatId));
         if (!chat) throw new NotFoundException("Chat not found.");
         if (!chat.members.some(member => member.id == user.id)) throw new UnauthorizedException("User does not have permission to send messages to this chat.");
@@ -68,8 +73,10 @@ export class ChatsController {
     @ApiOkResponse({ type: MessageInChatDto, isArray: true })
     @ApiQuery({ name: 'count', required: false })
     @ApiQuery({ name: 'from', required: false })
-    async getMessages(@Param("chatId") chatId: string, @Query("count") count: number = 20, @Query("from") from: number = 0): Promise<MessageInChatDto[]> {
+    @UseGuards(JwtAuthGuard)
+    async getMessages(@Request() req, @Param("chatId") chatId: string, @Query("count") count: number = 20, @Query("from") from: number = 0): Promise<MessageInChatDto[]> {
         const chat = await this.chatsService.getChatById(Number(chatId));
         return this.chatsService.getMessages(chat, count, from)
     }
 }
+
