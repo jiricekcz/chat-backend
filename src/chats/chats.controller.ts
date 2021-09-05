@@ -21,9 +21,7 @@ export class ChatsController {
     @ApiOkResponse({ type: ChatResponseDto, isArray: true })
     @UseGuards(JwtAuthGuard)
     async getAllChats(@Request() req): Promise<ChatResponseDto[]> {
-        const user = req.user;
-        console.log(req.user);
-        console.log(user);
+        const user = req.user.user;
         const chats = await this.chatsService.getAllChatsForUser(user);
         const rv: Array<ChatResponseDto> = [];
         for (const chat of chats) {

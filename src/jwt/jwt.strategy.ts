@@ -18,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt-custom") {
         if (!payload) throw new UnauthorizedException();
         return { 
             payload,
-            user: await this.usersService.findById(payload.sub)
+            user: await this.usersService.findById(payload.sub, true)
         }
     }
 }
