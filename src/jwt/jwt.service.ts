@@ -22,7 +22,7 @@ export class JwtService {
         return token;
     }
     async verify(token: string): Promise<any> {
-        if (token.split(".").length !== 3) throw new BadRequestException();
+        if (token?.split(".").length !== 3) throw new BadRequestException();
         const [header, payload, signature] = token.split(".");
         let verify = crypto.createVerify("RSA-SHA256");
         verify.update(header + "." + payload);
